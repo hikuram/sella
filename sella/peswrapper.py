@@ -5,7 +5,7 @@ from scipy.linalg import eigh
 from scipy.integrate import LSODA
 from ase import Atoms
 from ase.utils import basestring
-from ase.visualize import view
+#from ase.visualize import view
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.io.trajectory import Trajectory
 
@@ -472,7 +472,11 @@ class InternalPES(PES):
                 print('Bad internals found!')
                 break
             if ode.nfev > 1000:
-                view(self.atoms + self.dummies)
+                #view(self.atoms + self.dummies)
+                try:
+                    write("sella_ode_failure.xyz", self.atoms + self.dummies)
+                except Exception:
+                    pass
                 raise RuntimeError("Geometry update ODE is taking too long "
                                    "to converge!")
 
