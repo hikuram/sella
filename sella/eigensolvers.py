@@ -73,10 +73,7 @@ def rayleigh_ritz(A, gamma, P, B=None, v0=None, vref=None, vreftol=0.99,
         # a hack for the optbench.org eigensolver convergence test
         if vref is not None:
             x0 = V @ vecs[:, 0]
-            print(np.abs(x0 @ vref))
             if np.abs(x0 @ vref) > vreftol:
-                print("Dot product between your v0 and the final answer:",
-                      np.abs(v0 @ x0) / np.linalg.norm(v0))
                 return lams, V, AV
 
         # Loop over all Ritz values of interest
@@ -93,7 +90,7 @@ def rayleigh_ritz(A, gamma, P, B=None, v0=None, vref=None, vreftol=0.99,
 
         t = expand(V, Ytilde, P, B, lams, vecs, thetai, method, seeking)
         t /= np.linalg.norm(t)
-        if np.linalg.norm(t - V @ V.T @ t) < 1e-2:  # pragma: no cover
+        if np.linalg.norm(t - V @ (V.T @ t)) < 1e-2:  # pragma: no cover
             # Do Lanczos instead
             t = ri / np.linalg.norm(ri)
 
@@ -129,7 +126,8 @@ def expand(V, Y, P, B, lams, vecs, shift, method='jd0', seeking=0):
         Pprojv = solve(Pshift, vi)
         denom = vi.T @ Pprojv
         if abs(denom) < 1e-12:
-            return Pprojr  # Fall back when denominator is near zero
+            # Fallback when denominator is near zero
+            return Pprojr
         alpha = vi.T @ Pprojr / denom
         return Pprojv * alpha - Pprojr
     elif method == 'jd0':
